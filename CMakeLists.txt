@@ -1,41 +1,150 @@
-# Nous voulons un cmake "récent" pour utiliser les dernières fonctionnalités
 cmake_minimum_required(VERSION 3.24)
-project("IMAC")
-# Optionel: Changer le dossier de sortie des exécutables
+include(FetchContent)
+
+# list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+# Set the output directory for the executable to bin/Debug or bin/Release depending on the build type
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
-# Trouve tous les fichiers .cpp dans mon répertoire src
+# Get the name of the current folder and use it as the project name
+cmake_path(GET CMAKE_CURRENT_SOURCE_DIR FILENAME FOLDER_NAME)   
+string(REPLACE " " "_" FOLDER_NAME ${FOLDER_NAME})
+project(${FOLDER_NAME})
+
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS "src/*.cpp")
 
-# Trouve tous les fichiers .cpp dans mon répertoire src préfixés par "main_"
-file(GLOB_RECURSE SRC_MAIN_FILES CONFIGURE_DEPENDS "src/main_*.cpp")
+set(EXECUTABLE_NAME ${PROJECT_NAME})
+add_executable(${EXECUTABLE_NAME} ${SRC_FILES})
 
-# On enlève les fichiers main_ des fichiers sources
-list(REMOVE_ITEM SRC_FILES ${SRC_MAIN_FILES})
+# Pass the CMAKE_SOURCE_DIR to the code, so that we can make our paths relative to it
+target_compile_definitions(${EXECUTABLE_NAME} PRIVATE CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
 
-# Boucle sur chaque fichier cpp préfixé par "main_" pour créer autant d'exe
-foreach(SRC_MAIN_FILE ${SRC_MAIN_FILES})
-    # Nom du fichier sans le chemin ni l'extension
-    get_filename_component(EXECUTABLE_NAME ${SRC_MAIN_FILE} NAME_WE)
+target_include_directories(${EXECUTABLE_NAME} PRIVATE "src")
+target_compile_features(${EXECUTABLE_NAME} PRIVATE cxx_std_20)
 
-    # On enlève le préfixe "main_" et on supprime les espaces pour avoir un nom d'exécutable plus propre
-    string(REPLACE "main_" "" EXECUTABLE_NAME "${EXECUTABLE_NAME}")
-    string(REPLACE " " "_" EXECUTABLE_NAME "${EXECUTABLE_NAME}")
+# Set good compile options for the executable
+if (MSVC)
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE /W3)
+else()
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -Wall -Wextra -Wpedantic -pedantic-errors)
+endif()
 
-    # Ajoute un exécutable avec le nom du fichier et les autres fichiers sources
-    add_executable(${EXECUTABLE_NAME} ${SRC_MAIN_FILE} ${SRC_FILES})
+# Minimal third-party download strategy
+# Course setup: disable TLS verification for environments where CMake cannot validate cert chain.
+set(CMAKE_TLS_VERIFY 0)
+set(CMAKE_DEPS_DIR "${CMAKE_BINARY_DIR}/_deps")
+file(MAKE_DIRECTORY "${CMAKE_DEPS_DIR}")
 
-    # On ajoute le dossier src pour que le compilateur trouve les headers
-    target_include_directories(${EXECUTABLE_NAME} PRIVATE "src")
-
-    # On indique que l'on veut utiliser le C++17
-    target_compile_features(${EXECUTABLE_NAME} PRIVATE cxx_std_17)
-
-    # Quelques options de compilation pour ajouter des warnings
-    if (MSVC)
-        target_compile_options(${EXECUTABLE_NAME} PRIVATE /W3)
+function(download_if_missing OUT_PATH URL)
+    set(need_download OFF)
+    if(NOT EXISTS "${OUT_PATH}")
+        set(need_download ON)
     else()
-        target_compile_options(${EXECUTABLE_NAME} PRIVATE -Wall -Wextra -Wpedantic -pedantic-errors)
+        file(SIZE "${OUT_PATH}" existing_size)
+        if(existing_size EQUAL 0)
+            set(need_download ON)
+        endif()
     endif()
-    
+
+    if(need_download)
+        file(REMOVE "${OUT_PATH}")
+        message(STATUS "Downloading ${URL}")
+        file(DOWNLOAD "${URL}" "${OUT_PATH}" SHOW_PROGRESS STATUS download_status)
+        list(GET download_status 0 status_code)
+        if(NOT status_code EQUAL 0)
+            list(GET download_status 1 status_message)
+            message(FATAL_ERROR "Failed to download ${URL}: ${status_message}")
+        endif()
+        file(SIZE "${OUT_PATH}" downloaded_size)
+        if(downloaded_size EQUAL 0)
+            message(FATAL_ERROR "Downloaded empty file from ${URL}")
+        endif()
+    endif()
+endfunction()
+
+## glm (source-only via archive URL)
+set(GLM_VERSION "1.0.3")
+set(GLM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/${GLM_VERSION}.tar.gz)
+FetchContent_MakeAvailable(glm)
+
+## raylib (source-only)
+set(RAYLIB_VERSION "6.0")
+set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+FetchContent_Declare(raylib URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz)
+
+FetchContent_MakeAvailable(raylib)
+
+## imgui (only required source/header files)
+set(IMGUI_VERSION "v1.92.1")
+set(IMGUI_DIR "${CMAKE_DEPS_DIR}/imgui_src")
+file(MAKE_DIRECTORY "${IMGUI_DIR}")
+
+set(IMGUI_REQUIRED_FILES
+    imgui.h
+    imconfig.h
+    imgui_internal.h
+    imstb_rectpack.h
+    imstb_textedit.h
+    imstb_truetype.h
+    imgui.cpp
+    imgui_draw.cpp
+    imgui_tables.cpp
+    imgui_widgets.cpp
+)
+
+foreach(IMGUI_FILE IN LISTS IMGUI_REQUIRED_FILES)
+    download_if_missing(
+        "${IMGUI_DIR}/${IMGUI_FILE}"
+        "https://raw.githubusercontent.com/ocornut/imgui/${IMGUI_VERSION}/${IMGUI_FILE}"
+    )
 endforeach()
+
+add_library(imgui STATIC
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+)
+target_include_directories(imgui PUBLIC "${IMGUI_DIR}")
+target_compile_features(imgui PUBLIC cxx_std_20)
+
+## rlimgui (only required files)
+set(RLIMGUI_TAG "Raylib_6_0")
+set(RLIMGUI_DIR "${CMAKE_DEPS_DIR}/rlimgui_src")
+file(MAKE_DIRECTORY "${RLIMGUI_DIR}")
+
+set(RLIMGUI_REQUIRED_FILES
+    rlImGui.h
+    rlImGui.cpp
+    imgui_impl_raylib.h
+)
+
+foreach(RLIMGUI_FILE IN LISTS RLIMGUI_REQUIRED_FILES)
+    download_if_missing(
+        "${RLIMGUI_DIR}/${RLIMGUI_FILE}"
+        "https://raw.githubusercontent.com/raylib-extras/rlImGui/${RLIMGUI_TAG}/${RLIMGUI_FILE}"
+    )
+endforeach()
+
+add_library(rlimgui STATIC ${RLIMGUI_DIR}/rlImGui.cpp)
+target_include_directories(rlimgui PUBLIC "${RLIMGUI_DIR}")
+target_compile_definitions(rlimgui PUBLIC NO_FONT_AWESOME)
+target_compile_features(rlimgui PUBLIC cxx_std_20)
+target_link_libraries(rlimgui PUBLIC raylib imgui)
+
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE glm::glm raylib imgui rlimgui)
+
+# Treat raylib headers as system headers for this target to reduce warning noise.
+get_target_property(RAYLIB_INCLUDE_DIRS raylib INTERFACE_INCLUDE_DIRECTORIES)
+if(RAYLIB_INCLUDE_DIRS)
+    target_include_directories(${EXECUTABLE_NAME} SYSTEM PRIVATE ${RAYLIB_INCLUDE_DIRS})
+endif()
+
+# Additional settings for macOS for raylib
+if (APPLE)
+    # Link necessary frameworks for macOS
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC "-framework IOKit")
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC "-framework Cocoa")
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC "-framework OpenGL")
+endif()
