@@ -10,9 +10,9 @@
 std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
     std::vector<glm::vec2> positions {};
 
-    positions.reserve(1000);
+    positions.reserve(params.nbPointMax);
     // Naive random generation
-    for (int i {0}; i < 1000; ++i)
+    for (int i {0}; i < params.nbPointMax; ++i)
     {
         positions.emplace_back(
             static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
@@ -22,6 +22,46 @@ std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationPara
 
     // TODO(student): implement Poisson disk sampling to replace the above naive random generation
     // points output should be in [0..1] range, where (0,0) is one corner of the terrain and (1,1) is the opposite corner, so they can be easily scaled to terrain size and sampled from heightmap.
+    std::vector<glm::vec2> activePoints {};
+
+    // Ajout d'un point aléatoire dans activePoint
+    activePoints.emplace_back(
+        static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
+        static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
+    );
+
+    while (activePoints.size() > 0) {
+        std::size_t randomIndex { GetRandomValue(0, activePoints.size()) };
+        
+        glm::vec2 selectedActivePoint { activePoints[randomIndex] };
+
+        for(int i { 0 }; i < params.nbEssaie; i++) {
+            float angle { GetRandomValue(0, 1) * M_PI * 2};
+            float rayon { GetRandomValue(params.rayonMinimal, 2 * params.rayonMinimal) };
+
+            glm::vec2 direction { cos(angle) * rayon, sin(angle) * rayon};
+            glm::vec2 candidate { selectedActivePoint + direction };
+
+            if(candidate.x >= 0 && candidate.x <= 1 && candidate.y >= 0 && candidate.y <= 1) {
+                float beginX { candidate.x - params.rayonMinimal };
+                float endX { candidate.x + params.rayonMinimal };
+                float beginY { candidate.y - params.rayonMinimal };
+                float endY { candidate.y + params.rayonMinimal };
+
+                for(size_t i { 0 }; i < activePoints.size(); i++) {
+                    glm::vec2 currentActivePoint { activePoints[i] };
+
+                    if(beginX < currentActivePoint.x < endX && beginY < currentActivePoint.y < endY) {
+                        
+                    }
+                }
+
+            } else {
+                continue;
+            }
+        }
+    }
+
     return positions;
 }
 

@@ -12,6 +12,17 @@ struct ImageGenerationParameters {
 
 struct PointsGenerationParameters {
     // TODO(student): add parameters for points generation (ex: poisson disk radius, etc).
+    // Poisson Disk Sampling
+    int nbEssaie { 4 };
+    float rayonMinimal { 0.05 }; 
+    int nbPointMax { 1000 }; 
+};
+
+enum Seasons {
+    Spring,
+    Summer,
+    Fall,
+    Winter
 };
 
 struct AppContext {
@@ -44,6 +55,9 @@ struct AppContext {
 
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
+
+    // Seasons selector
+    Seasons season { Seasons::Spring };
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);

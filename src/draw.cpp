@@ -52,6 +52,30 @@ void drawImGui(AppContext& context) {
     if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
     }
+
+    if (ImGui::CollapsingHeader("Seasons", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if(ImGui::Button("Spring")) {
+            context.season = Seasons::Spring;
+        }
+
+        if(ImGui::Button("Summer")) {
+            context.season = Seasons::Summer;
+        }
+
+        if(ImGui::Button("Fall")) {
+            context.season = Seasons::Fall;
+        }
+
+        if(ImGui::Button("Winter")) {
+            context.season = Seasons::Winter;
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f);
+        ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 1.0f);
+        ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 2000.0f);
+    }
 }
 
 void drawRaylibUI(AppContext& context) {
