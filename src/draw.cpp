@@ -3,7 +3,7 @@
 #include "app.hpp"
 
 #include "generation.hpp"
-
+#include "third_party/random.hpp"
 #include "imgui.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -46,6 +46,13 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
 
 void drawImGui(AppContext& context) {
     if (ImGui::Button("Generate random positions")) {
+        generateObjectsPositions(context);
+    }
+    if (ImGui::Button("Generate random map layout")) {
+        context.esperance = p6::random::number(0.01f, 1.0f);
+        context.ecarttype = p6::random::number(0.01f, 1.0f);
+        generateHeightmap(context);
+        regenerateMeshFromImage(context);
         generateObjectsPositions(context);
     }
 
