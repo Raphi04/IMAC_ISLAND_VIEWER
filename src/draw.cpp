@@ -8,6 +8,8 @@
 #include "raylib.h"
 #include "raymath.h"
 
+#include "biome.hpp"
+
 void draw3DScene(AppContext& context) {
     ClearBackground(RAYWHITE);
     
@@ -44,32 +46,67 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
     }
 }
 
+void RegenerateMap(AppContext& context)
+{
+        generateHeightmap(context);
+        regenerateMeshFromImage(context);
+        generateObjectsPositions(context);
+}
+
 void drawImGui(AppContext& context) {
+    if (ImGui::CollapsingHeader("Randomizer", ImGuiTreeNodeFlags_DefaultOpen)) {
     if (ImGui::Button("Generate random positions")) {
         generateObjectsPositions(context);
     }
     if (ImGui::Button("Generate random map layout")) {
         context.esperance = p6::random::number(0.01f, 1.0f);
         context.ecarttype = p6::random::number(0.01f, 1.0f);
-        generateHeightmap(context);
-        regenerateMeshFromImage(context);
-        generateObjectsPositions(context);
+        RegenerateMap(context);
     }
-
-    if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::Button("Generate random biome")) {
+        selectBiome = p6::random::integer(0,numberBiomes);
+        RegenerateMap(context);
+    }
+}
+    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
         if (ImGui::SliderFloat("Esperance", &context.esperance, 0.01f, 1.0f)) {
-            generateHeightmap(context);
-            regenerateMeshFromImage(context);
-            generateObjectsPositions(context);
+            RegenerateMap(context);
         }
         if (ImGui::SliderFloat("Ecart type", &context.ecarttype, 0.01f, 1.0f)) {
-            generateHeightmap(context);
-            regenerateMeshFromImage(context);
-            generateObjectsPositions(context);
+            RegenerateMap(context);
+        }
+    }
+    if (ImGui::CollapsingHeader("Biomes", ImGuiTreeNodeFlags_DefaultOpen)) 
+    {
+        if (ImGui::Button("Plaine")) 
+        {
+            selectBiome = 0;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Arctique")) 
+        {
+            selectBiome = 1;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Desert")) 
+        {
+            selectBiome = 2;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Magma")) 
+        {
+            selectBiome = 3;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("The End")) 
+        {
+            selectBiome = 4;
+            RegenerateMap(context);
         }
     }
 }
+
 
 void drawRaylibUI(AppContext& context) {
     int screenWidth { GetScreenWidth() };

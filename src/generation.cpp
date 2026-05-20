@@ -4,8 +4,10 @@
 #include "raylib.h"
 
 #include "utils/raylibUtils.hpp"
-#include <algorithm> // for std::clamp
 
+#include "biome.hpp"
+#include <algorithm> // for std::clamp
+#include <span>
 
 std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
     std::vector<glm::vec2> positions {};
@@ -40,7 +42,6 @@ void generateObjectsPositions(AppContext& context) {
         );
     }
     // TODO(student): extension - filter positions by sampled height range.
-
 }
 
 float sampleHeightmap(AppContext const& context, float u, float v)
@@ -67,6 +68,23 @@ float sampleHeightmap(AppContext const& context, float u, float v)
 float gaussian(float x, float ecarttype, float esperance)
 {
     return (1.f / (ecarttype * sqrt(2.f * 3.14f))) * exp(-0.5f * pow((x - esperance) / ecarttype, 2.f));
+}
+
+Color heightToColor (float v)
+{
+    std::span<const ColorHeight> couleursPalette = biomes[selectBiome];
+
+    for (int i = 0; i < numberBiomes; i++)
+    {
+        if (v <= couleursPalette[i+1].h)
+        {
+            /*On calcul d'abord la distance entre la hauteur de notre pixel et la hauteur de l'élément de la palette correspondante à cette hauteur, 
+            puis on fait un rapport avec l'écart entre le prochain élément et celui actuel, afin de rester dans le scope [0,1] et d'avoir un joli dégradé !*/
+            float const positionGradient = (v - couleursPalette[i].h) / (couleursPalette[i + 1].h - couleursPalette[i].h); 
+            return ColorLerp(couleursPalette[i].c, couleursPalette[i+1].c, positionGradient);
+        }
+    }
+    return couleursPalette[numberBiomes].c;
 }
 
 void generateHeightmap(AppContext& context) {
@@ -101,19 +119,9 @@ void generateHeightmap(AppContext& context) {
 
     // exemple conversion from heightmap to color image
     context.image = TransformImage<float, Color>(context.heightmapImage, [&](float const& v, int const, int const) {
-        if (v < 0.3f)
-        {
-            return color_from({ 70, 130, 180 }); // water
-        }
-        else if (v < 0.5f)
-        {
-            return color_from({ 238, 214, 175 }); // sand
-        }
-        else
-        {
-            return color_from({ 34, 139, 34 }); // grass
-        }
-        
+
+        return heightToColor(v);
+
     }, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
     context.texture = LoadTextureFromImage(context.image);
