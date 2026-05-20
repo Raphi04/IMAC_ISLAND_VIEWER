@@ -10,15 +10,15 @@
 std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
     std::vector<glm::vec2> positions {};
 
-    positions.reserve(params.nbPointMax);
-    // Naive random generation
-    for (int i {0}; i < params.nbPointMax; ++i)
-    {
-        positions.emplace_back(
-            static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
-            static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
-        );
-    }
+    // positions.reserve(params.nbPointMax);
+    // // Naive random generation
+    // for (int i {0}; i < params.nbPointMax; ++i)
+    // {
+    //     positions.emplace_back(
+    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
+    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
+    //     );
+    // }
 
     // TODO(student): implement Poisson disk sampling to replace the above naive random generation
     // points output should be in [0..1] range, where (0,0) is one corner of the terrain and (1,1) is the opposite corner, so they can be easily scaled to terrain size and sampled from heightmap.
@@ -30,35 +30,47 @@ std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationPara
         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
     );
 
-    while (activePoints.size() > 0) {
-        std::size_t randomIndex { GetRandomValue(0, activePoints.size()) };
+    while (activePoints.size() > 0 && activePoints.size() < params.nbPointMax) {
+       std::size_t randomIndex { static_cast<size_t>(GetRandomValue(0, activePoints.size() - 1)) };
         
         glm::vec2 selectedActivePoint { activePoints[randomIndex] };
 
+        bool isFree { false };
+
         for(int i { 0 }; i < params.nbEssaie; i++) {
-            float angle { GetRandomValue(0, 1) * M_PI * 2};
-            float rayon { GetRandomValue(params.rayonMinimal, 2 * params.rayonMinimal) };
+            float angle { static_cast<float>(GetRandomValue(0, INT_MAX) / static_cast<float>(INT_MAX) * M_PI * 2) };
+            float rayon { static_cast<float>((1 + GetRandomValue(0, INT_MAX) / static_cast<float>(INT_MAX)) * params.rayonMinimal) };
 
             glm::vec2 direction { cos(angle) * rayon, sin(angle) * rayon};
             glm::vec2 candidate { selectedActivePoint + direction };
 
+            bool isValid { true };
+
             if(candidate.x >= 0 && candidate.x <= 1 && candidate.y >= 0 && candidate.y <= 1) {
-                float beginX { candidate.x - params.rayonMinimal };
-                float endX { candidate.x + params.rayonMinimal };
-                float beginY { candidate.y - params.rayonMinimal };
-                float endY { candidate.y + params.rayonMinimal };
 
-                for(size_t i { 0 }; i < activePoints.size(); i++) {
-                    glm::vec2 currentActivePoint { activePoints[i] };
+                for(int i { 0 }; i < positions.size(); i++) {
+                    glm::vec2 currentPoint { positions[i] };
 
-                    if(beginX < currentActivePoint.x < endX && beginY < currentActivePoint.y < endY) {
-                        
+                    if(glm::distance(candidate, currentPoint) < params.rayonMinimal) {
+                        isValid = false;
+                        break;
                     }
+                }
+
+                if(isValid) {
+                    positions.push_back(candidate);
+                    activePoints.push_back(candidate);
+                    isFree = true;
+                    break;
                 }
 
             } else {
                 continue;
             }
+        }
+        
+        if(!isFree) {
+            activePoints.erase(activePoints.begin() + randomIndex);
         }
     }
 
