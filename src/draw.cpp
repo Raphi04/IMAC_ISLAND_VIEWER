@@ -45,12 +45,22 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
 }
 
 void drawImGui(AppContext& context) {
-    if(ImGui::Button("Generate random positions")) {
+    if (ImGui::Button("Generate random positions")) {
         generateObjectsPositions(context);
     }
 
     if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
+        if (ImGui::SliderFloat("Esperance", &context.esperance, 0.01f, 1.0f)) {
+            generateHeightmap(context);
+            regenerateMeshFromImage(context);
+            generateObjectsPositions(context);
+        }
+        if (ImGui::SliderFloat("Ecart type", &context.ecarttype, 0.01f, 1.0f)) {
+            generateHeightmap(context);
+            regenerateMeshFromImage(context);
+            generateObjectsPositions(context);
+        }
     }
 }
 

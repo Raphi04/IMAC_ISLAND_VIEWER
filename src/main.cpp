@@ -6,6 +6,8 @@
 #include "draw.hpp"
 #include "generation.hpp"
 
+#include <filesystem>
+
 int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 720, "IMAC island viewer");

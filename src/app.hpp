@@ -8,6 +8,7 @@ struct ImageGenerationParameters {
     int noiseSeed { 0 };
     float noiseScale { 4.0f };
     int resolution { 256 };
+
 };
 
 struct PointsGenerationParameters {
@@ -38,6 +39,10 @@ struct AppContext {
     Mesh cube {};
     Material cubeMaterial {};
     float cubeScale { 0.1f };
+
+    //For Gaussian Mask
+    float esperance = 0.f;
+    float ecarttype = 0.3f;
 
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;

@@ -40,6 +40,7 @@ void generateObjectsPositions(AppContext& context) {
         );
     }
     // TODO(student): extension - filter positions by sampled height range.
+
 }
 
 float sampleHeightmap(AppContext const& context, float u, float v)
@@ -60,6 +61,12 @@ float sampleHeightmap(AppContext const& context, float u, float v)
     // Otherwise, we assume it's in a color format and we read the red channel as height (with normalization from [0..255] to [0..1]).
     Color const c = GetImageColor(context.heightmapImage, px, py);
     return static_cast<float>(c.r)/255.0f;
+}
+
+// Formule trouvé sur : https://www.geogebra.org/m/xayqndug
+float gaussian(float x, float ecarttype, float esperance)
+{
+    return (1.f / (ecarttype * sqrt(2.f * 3.14f))) * exp(-0.5f * pow((x - esperance) / ecarttype, 2.f));
 }
 
 void generateHeightmap(AppContext& context) {
@@ -84,8 +91,12 @@ void generateHeightmap(AppContext& context) {
     context.heightmapImage = GenImageFromNoiseFunction<float>(resolution, resolution, PIXELFORMAT_UNCOMPRESSED_R32,
         [&](glm::vec2 const& p)->float {
             // TODO(student): implement stack based noise and island mask
-
-            return (perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f);
+            
+            glm::vec2 const center {0.5f,0.5f};
+            float distance = glm::distance(p,center);
+            float mask = gaussian(distance, context.ecarttype, context.esperance);
+            float noise = perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f;
+            return (noise * mask);
         });
 
     // exemple conversion from heightmap to color image
