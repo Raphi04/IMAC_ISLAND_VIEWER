@@ -23,7 +23,7 @@ int main() {
         SetWindowSize(monitor_width/2, monitor_height/2);
         SetWindowPosition(monitor_width/4, monitor_height/4);
     }
-    SetTargetFPS(30);
+    SetTargetFPS(60);
 
     rlImGuiSetup(true);
 

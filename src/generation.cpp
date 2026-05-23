@@ -32,14 +32,20 @@ void generateObjectsPositions(AppContext& context) {
 
     context.objectPositions.clear();
     context.objectPositions.reserve(positions.size());
+    float z;
+    float minHeightObject = context.imageGenerationParameters.minHeightObject;
+    float maxHeightObject = context.imageGenerationParameters.maxHeightObject;
     for (glm::vec2 const& p : positions)
     {
-        context.objectPositions.emplace_back(
-            p.x, // x
-            p.y, // y
+        z = sampleHeightmap(context, p.x, p.y);
+        if (z >= minHeightObject && z <= maxHeightObject)
+        {
+                context.objectPositions.emplace_back(
+                p.x, // x
+                p.y, // y
+                sampleHeightmap(context, p.x, p.y));
+        }
             // sample height from heightmap for each point (asuming positions are normalized in [0..1] range)
-            sampleHeightmap(context, p.x, p.y)
-        );
     }
     // TODO(student): extension - filter positions by sampled height range.
 }
@@ -112,9 +118,9 @@ void generateHeightmap(AppContext& context) {
             
             glm::vec2 const center {0.5f,0.5f};
             float distance = glm::distance(p,center);
-            float mask = gaussian(distance, context.ecarttype, context.esperance);
-            float noise = perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f;
-            return (noise * mask);
+            float mask = gaussian(distance, context.imageGenerationParameters.ecarttype, context.imageGenerationParameters.esperance);
+            float basenoise = perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f;
+            return (basenoise * mask);
         });
 
     // exemple conversion from heightmap to color image

@@ -8,8 +8,8 @@ inline int selectBiome{0};
 
 struct ColorHeight
 {
-    float h;
-    Color c;
+    float h; // Hauteur
+    Color c; // Couleurs
 }; // Structure pour mieux stocker les valeurs de hauteur et de couleurs + palettes
 
 const ColorHeight plaine[] =
@@ -62,12 +62,26 @@ const ColorHeight theEnd[] = {
     {0.95f, {0, 0, 0, 255}}, // End sky
 };
 
-inline std::span<const ColorHeight> biomes[] = {
+const ColorHeight mesa[] = {
+    {0.0f, {207, 124, 24, 255}}, // Bottom mesa1
+    {0.05f, {127, 74, 40, 255}},   // Bottom mesa2
+    {0.1f, {196, 152, 55, 255}}, // Bottom mesa3
+    {0.2f, {161, 101, 79, 255}},    // Middle mesa1
+    {0.3f, {90, 68, 79, 255}},    // Middle mesa2
+    {0.45f, {172, 84, 91, 255}},    // Middle mesa3
+    {0.6f, {180, 121, 101, 255}},  // Top mesa1
+    {0.7f, {204, 182, 169, 255}},  // End Top
+};
+
+
+inline std::span<const ColorHeight> biomes[] = 
+{
         plaine,
         arctique,
         desert,
         magma,
         theEnd,
-    };
+        mesa,
+};
 
 inline int numberBiomes = std::size(biomes);

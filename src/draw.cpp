@@ -59,21 +59,32 @@ void drawImGui(AppContext& context) {
         generateObjectsPositions(context);
     }
     if (ImGui::Button("Generate random map layout")) {
-        context.esperance = p6::random::number(0.01f, 1.0f);
-        context.ecarttype = p6::random::number(0.01f, 1.0f);
+        context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
+        context.imageGenerationParameters.ecarttype = p6::random::number(0.01f, 1.0f);
         RegenerateMap(context);
     }
     if (ImGui::Button("Generate random biome")) {
         selectBiome = p6::random::integer(0,numberBiomes);
         RegenerateMap(context);
     }
+    if (ImGui::Button("Random height object")) {
+        context.imageGenerationParameters.minHeightObject = p6::random::number(0.,1.);
+        context.imageGenerationParameters.maxHeightObject = p6::random::number(0.,1.);
+        RegenerateMap(context);
+    }
 }
     if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
-        if (ImGui::SliderFloat("Esperance", &context.esperance, 0.01f, 1.0f)) {
+        if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
             RegenerateMap(context);
         }
-        if (ImGui::SliderFloat("Ecart type", &context.ecarttype, 0.01f, 1.0f)) {
+        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.0f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Seuil de hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Seuil de hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.01f, 1.0f)) {
             RegenerateMap(context);
         }
     }
@@ -102,6 +113,11 @@ void drawImGui(AppContext& context) {
         if (ImGui::Button("The End")) 
         {
             selectBiome = 4;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Mesa")) 
+        {
+            selectBiome = 5;
             RegenerateMap(context);
         }
     }
