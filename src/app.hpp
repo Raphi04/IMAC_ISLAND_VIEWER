@@ -14,8 +14,8 @@ struct PointsGenerationParameters {
     // TODO(student): add parameters for points generation (ex: poisson disk radius, etc).
     // Poisson Disk Sampling
     int nbEssaie { 4 };
-    float rayonMinimal { 0.05 }; 
-    int nbPointMax { 1000 }; 
+    float rayonMinimal { 0.04 }; 
+    int nbPointMax { 500 }; 
 };
 
 enum Seasons {

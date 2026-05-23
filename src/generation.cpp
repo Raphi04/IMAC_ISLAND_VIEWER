@@ -8,58 +8,85 @@
 
 
 std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
-    std::vector<glm::vec2> positions {};
-
-    // positions.reserve(params.nbPointMax);
-    // // Naive random generation
-    // for (int i {0}; i < params.nbPointMax; ++i)
-    // {
-    //     positions.emplace_back(
-    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
-    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
-    //     );
-    // }
-
     // TODO(student): implement Poisson disk sampling to replace the above naive random generation
     // points output should be in [0..1] range, where (0,0) is one corner of the terrain and (1,1) is the opposite corner, so they can be easily scaled to terrain size and sampled from heightmap.
+    
+    // Calcul de la taille d'une cellule
+    float cellSize = params.rayonMinimal/sqrt(2);
+    
+    // Points finaux
+    std::vector<glm::vec2> positions {};
+
+    // Point actifs
     std::vector<glm::vec2> activePoints {};
 
-    // Ajout d'un point aléatoire dans activePoint
-    activePoints.emplace_back(
-        static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
-        static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
+    // Grille de points
+    std::vector<std::vector<int>> grid(
+        ceil(1 / cellSize),
+        std::vector<int>(ceil(1 / cellSize))
     );
 
-    while (activePoints.size() > 0 && activePoints.size() < params.nbPointMax) {
-       std::size_t randomIndex { static_cast<size_t>(GetRandomValue(0, activePoints.size() - 1)) };
-        
+    // Ajout d'un point au centre de l'ile dans activePoint
+    activePoints.emplace_back(0.5f, 0.5f);
+
+    // Tant qu'il y a des points actifs et qu'on a pas atteint un nombre de points maximum
+    while (activePoints.size() > 0 && static_cast<int>(positions.size()) < params.nbPointMax) {
+
+        // On prend un point aléatoire dans les points actifs
+        std::size_t randomIndex { static_cast<size_t>(GetRandomValue(0, activePoints.size() - 1)) };
         glm::vec2 selectedActivePoint { activePoints[randomIndex] };
 
+        // Booléan qui détermine si le points actifs à encore de la place autour de lui
         bool isFree { false };
 
+        // On essaie n fois de trouver un nouveau point qui fonctionne
         for(int i { 0 }; i < params.nbEssaie; i++) {
+
+            // On prend un angle aléatoire autour du point actif 
             float angle { static_cast<float>(GetRandomValue(0, INT_MAX) / static_cast<float>(INT_MAX) * M_PI * 2) };
+
+            // On prend un rayon aléatoire entre 1 et 2 fois le rayon minimum
             float rayon { static_cast<float>((1 + GetRandomValue(0, INT_MAX) / static_cast<float>(INT_MAX)) * params.rayonMinimal) };
 
+            // On détermine la position du point candidat
             glm::vec2 direction { cos(angle) * rayon, sin(angle) * rayon};
             glm::vec2 candidate { selectedActivePoint + direction };
 
+            // Booléan permettant de savoir si le point est valide
             bool isValid { true };
 
+            // On vérifie que le point est comprit dans la nos limites
             if(candidate.x >= 0 && candidate.x <= 1 && candidate.y >= 0 && candidate.y <= 1) {
 
-                for(int i { 0 }; i < positions.size(); i++) {
-                    glm::vec2 currentPoint { positions[i] };
+                // Point candidat dans la grille
+                int cellX { static_cast<int>(candidate.x / cellSize) };
+                int cellY { static_cast<int>(candidate.y / cellSize) };
 
-                    if(glm::distance(candidate, currentPoint) < params.rayonMinimal) {
-                        isValid = false;
-                        break;
+                // Variable pour la recherche dans la grille
+                int searchStartX = std::max(0, cellX - 2);
+                int searchEndX = std::min(cellX + 2, static_cast<int>(grid.size() - 1));
+                int searchStartY = std::max(0, cellY - 2);
+                int searchEndY = std::min(cellY + 2, static_cast<int>(grid.size() - 1));
+
+                // Recherche autour du point candidat
+                for(int x { searchStartX }; x <= searchEndX; x++) {
+                    for(int y { searchStartY }; y <= searchEndY; y++) {
+                        int pointGrille { grid[x][y] - 1 };
+                        if(pointGrille != -1) {
+                            if(glm::distance(candidate, positions[pointGrille]) < params.rayonMinimal) {
+                                isValid = false;
+                                break;
+                            }
+                        }
+
                     }
                 }
 
+                // Si le point candidat est valide on l'ajoute aux points finaux et actifs
                 if(isValid) {
                     positions.push_back(candidate);
                     activePoints.push_back(candidate);
+                    grid[static_cast<int>(candidate.x / cellSize)][static_cast<int>(candidate.y / cellSize)] = positions.size();
                     isFree = true;
                     break;
                 }
@@ -69,6 +96,7 @@ std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationPara
             }
         }
         
+        // Si le point n'est pas de place autour de lui, on le retire des points actifs
         if(!isFree) {
             activePoints.erase(activePoints.begin() + randomIndex);
         }

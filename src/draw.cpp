@@ -73,8 +73,8 @@ void drawImGui(AppContext& context) {
 
     if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f);
-        ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 1.0f);
-        ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 2000.0f);
+        ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f);
+        ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f);
     }
 }
 
