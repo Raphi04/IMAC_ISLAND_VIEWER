@@ -4,8 +4,10 @@
 #include "raylib.h"
 
 #include "utils/raylibUtils.hpp"
-#include <algorithm> // for std::clamp
 
+#include "biome.hpp"
+#include <algorithm> // for std::clamp
+#include <span>
 
 std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
     std::vector<glm::vec2> positions {};
@@ -30,14 +32,20 @@ void generateObjectsPositions(AppContext& context) {
 
     context.objectPositions.clear();
     context.objectPositions.reserve(positions.size());
+    float z;
+    float minHeightObject = context.imageGenerationParameters.minHeightObject;
+    float maxHeightObject = context.imageGenerationParameters.maxHeightObject;
     for (glm::vec2 const& p : positions)
     {
-        context.objectPositions.emplace_back(
-            p.x, // x
-            p.y, // y
+        z = sampleHeightmap(context, p.x, p.y);
+        if (z >= minHeightObject && z <= maxHeightObject)
+        {
+                context.objectPositions.emplace_back(
+                p.x, // x
+                p.y, // y
+                sampleHeightmap(context, p.x, p.y));
+        }
             // sample height from heightmap for each point (asuming positions are normalized in [0..1] range)
-            sampleHeightmap(context, p.x, p.y)
-        );
     }
     // TODO(student): extension - filter positions by sampled height range.
 }
@@ -62,6 +70,29 @@ float sampleHeightmap(AppContext const& context, float u, float v)
     return static_cast<float>(c.r)/255.0f;
 }
 
+// Formule trouvé sur : https://www.geogebra.org/m/xayqndug
+float gaussian(float x, float ecarttype, float esperance)
+{
+    return (1.f / (ecarttype * sqrt(2.f * 3.14f))) * exp(-0.5f * pow((x - esperance) / ecarttype, 2.f));
+}
+
+Color heightToColor (float v)
+{
+    std::span<const ColorHeight> couleursPalette = biomes[selectBiome];
+
+    for (int i = 0; i < numberBiomes; i++)
+    {
+        if (v <= couleursPalette[i+1].h)
+        {
+            /*On calcul d'abord la distance entre la hauteur de notre pixel et la hauteur de l'élément de la palette correspondante à cette hauteur, 
+            puis on fait un rapport avec l'écart entre le prochain élément et celui actuel, afin de rester dans le scope [0,1] et d'avoir un joli dégradé !*/
+            float const positionGradient = (v - couleursPalette[i].h) / (couleursPalette[i + 1].h - couleursPalette[i].h); 
+            return ColorLerp(couleursPalette[i].c, couleursPalette[i+1].c, positionGradient);
+        }
+    }
+    return couleursPalette[numberBiomes].c;
+}
+
 void generateHeightmap(AppContext& context) {
 
     if (context.texture.id > 0) {
@@ -84,25 +115,19 @@ void generateHeightmap(AppContext& context) {
     context.heightmapImage = GenImageFromNoiseFunction<float>(resolution, resolution, PIXELFORMAT_UNCOMPRESSED_R32,
         [&](glm::vec2 const& p)->float {
             // TODO(student): implement stack based noise and island mask
-
-            return (perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f);
+            
+            glm::vec2 const center {0.5f,0.5f};
+            float distance = glm::distance(p,center);
+            float mask = gaussian(distance, context.imageGenerationParameters.ecarttype, context.imageGenerationParameters.esperance);
+            float basenoise = perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f;
+            return (basenoise * mask);
         });
 
     // exemple conversion from heightmap to color image
     context.image = TransformImage<float, Color>(context.heightmapImage, [&](float const& v, int const, int const) {
-        if (v < 0.3f)
-        {
-            return color_from({ 70, 130, 180 }); // water
-        }
-        else if (v < 0.5f)
-        {
-            return color_from({ 238, 214, 175 }); // sand
-        }
-        else
-        {
-            return color_from({ 34, 139, 34 }); // grass
-        }
-        
+
+        return heightToColor(v);
+
     }, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
     context.texture = LoadTextureFromImage(context.image);
