@@ -158,19 +158,18 @@ float gaussian(float x, float ecarttype, float esperance)
 
 Color heightToColor (float v)
 {
-    std::span<const ColorHeight> couleursPalette = biomes[selectBiome];
+    std::vector<ColorHeight> couleursPalette = biomes[selectBiome];
 
-    for (int i = 0; i < numberBiomes; i++)
-    {
-        if (v <= couleursPalette[i+1].h)
-        {
+    for (size_t i = 0; i < biomes.size(); i++) {
+        if (v <= couleursPalette[i+1].h) {
             /*On calcul d'abord la distance entre la hauteur de notre pixel et la hauteur de l'élément de la palette correspondante à cette hauteur, 
             puis on fait un rapport avec l'écart entre le prochain élément et celui actuel, afin de rester dans le scope [0,1] et d'avoir un joli dégradé !*/
             float const positionGradient = (v - couleursPalette[i].h) / (couleursPalette[i + 1].h - couleursPalette[i].h); 
             return ColorLerp(couleursPalette[i].c, couleursPalette[i+1].c, positionGradient);
         }
     }
-    return couleursPalette[numberBiomes].c;
+
+    return couleursPalette[biomes.size()].c;
 }
 
 void generateHeightmap(AppContext& context) {

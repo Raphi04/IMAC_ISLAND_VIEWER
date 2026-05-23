@@ -55,70 +55,36 @@ void RegenerateMap(AppContext& context)
 
 void drawImGui(AppContext& context) {
     if (ImGui::CollapsingHeader("Randomizer", ImGuiTreeNodeFlags_DefaultOpen)) {
-    if (ImGui::Button("Generate random positions")) {
-        generateObjectsPositions(context);
-    }
-    if (ImGui::Button("Generate random map layout")) {
-        context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
-        context.imageGenerationParameters.ecarttype = p6::random::number(0.01f, 1.0f);
-        RegenerateMap(context);
-    }
-    if (ImGui::Button("Generate random biome")) {
-        selectBiome = p6::random::integer(0,numberBiomes);
-        RegenerateMap(context);
-    }
-    if (ImGui::Button("Random height object")) {
-        context.imageGenerationParameters.minHeightObject = p6::random::number(0.,1.);
-        context.imageGenerationParameters.maxHeightObject = p6::random::number(0.,1.);
-        RegenerateMap(context);
-    }
 
-    if (ImGui::CollapsingHeader("Seasons", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if(ImGui::Button("Spring")) {
-            context.season = Seasons::Spring;
+        if (ImGui::Button("Random positions")) {
+            generateObjectsPositions(context);
         }
 
-        if(ImGui::Button("Summer")) {
-            context.season = Seasons::Summer;
-        }
-
-        if(ImGui::Button("Fall")) {
-            context.season = Seasons::Fall;
-        }
-
-        if(ImGui::Button("Winter")) {
-            context.season = Seasons::Winter;
-        }
-    }
-
-    if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f);
-        ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f);
-        ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f);
-    }
-}
-    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
-        if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
+        if (ImGui::Button("Random map layout")) {
+            context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
+            context.imageGenerationParameters.ecarttype = p6::random::number(0.01f, 1.0f);
             RegenerateMap(context);
         }
-        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.0f, 1.0f)) {
+
+        if (ImGui::Button("Random biome")) {
+            selectBiome = p6::random::integer(0, biomes.size());
             RegenerateMap(context);
         }
-        if (ImGui::SliderFloat("Seuil de hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.01f, 1.0f)) {
-            RegenerateMap(context);
-        }
-        if (ImGui::SliderFloat("Seuil de hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.01f, 1.0f)) {
+
+        if (ImGui::Button("Random height object")) {
+            context.imageGenerationParameters.minHeightObject = p6::random::number(0.f, 0.5f);
+            context.imageGenerationParameters.maxHeightObject = p6::random::number(0.5f, 1.f);
             RegenerateMap(context);
         }
     }
-    if (ImGui::CollapsingHeader("Biomes", ImGuiTreeNodeFlags_DefaultOpen)) 
-    {
-        if (ImGui::Button("Plaine")) 
-        {
+
+    
+    if (ImGui::CollapsingHeader("Biomes", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::Button("Plaine")) {
             selectBiome = 0;
             RegenerateMap(context);
         }
+
         if (ImGui::Button("Arctique")) 
         {
             selectBiome = 1;
@@ -142,6 +108,39 @@ void drawImGui(AppContext& context) {
         if (ImGui::Button("Mesa")) 
         {
             selectBiome = 5;
+            RegenerateMap(context);
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f)) {
+            RegenerateMap(context);
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.0f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.f, 0.5f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.5f, 1.f)) {
             RegenerateMap(context);
         }
     }
