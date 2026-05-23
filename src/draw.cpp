@@ -3,10 +3,12 @@
 #include "app.hpp"
 
 #include "generation.hpp"
-
+#include "third_party/random.hpp"
 #include "imgui.h"
 #include "raylib.h"
 #include "raymath.h"
+
+#include "biome.hpp"
 
 void draw3DScene(AppContext& context) {
     ClearBackground(RAYWHITE);
@@ -44,13 +46,31 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
     }
 }
 
+void RegenerateMap(AppContext& context)
+{
+        generateHeightmap(context);
+        regenerateMeshFromImage(context);
+        generateObjectsPositions(context);
+}
+
 void drawImGui(AppContext& context) {
-    if(ImGui::Button("Generate random positions")) {
+    if (ImGui::CollapsingHeader("Randomizer", ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::Button("Generate random positions")) {
         generateObjectsPositions(context);
     }
-
-    if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
+    if (ImGui::Button("Generate random map layout")) {
+        context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
+        context.imageGenerationParameters.ecarttype = p6::random::number(0.01f, 1.0f);
+        RegenerateMap(context);
+    }
+    if (ImGui::Button("Generate random biome")) {
+        selectBiome = p6::random::integer(0,numberBiomes);
+        RegenerateMap(context);
+    }
+    if (ImGui::Button("Random height object")) {
+        context.imageGenerationParameters.minHeightObject = p6::random::number(0.,1.);
+        context.imageGenerationParameters.maxHeightObject = p6::random::number(0.,1.);
+        RegenerateMap(context);
     }
 
     if (ImGui::CollapsingHeader("Seasons", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -77,6 +97,56 @@ void drawImGui(AppContext& context) {
         ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f);
     }
 }
+    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
+        if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.0f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Seuil de hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Seuil de hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+    }
+    if (ImGui::CollapsingHeader("Biomes", ImGuiTreeNodeFlags_DefaultOpen)) 
+    {
+        if (ImGui::Button("Plaine")) 
+        {
+            selectBiome = 0;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Arctique")) 
+        {
+            selectBiome = 1;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Desert")) 
+        {
+            selectBiome = 2;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Magma")) 
+        {
+            selectBiome = 3;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("The End")) 
+        {
+            selectBiome = 4;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Mesa")) 
+        {
+            selectBiome = 5;
+            RegenerateMap(context);
+        }
+    }
+}
+
 
 void drawRaylibUI(AppContext& context) {
     int screenWidth { GetScreenWidth() };

@@ -8,6 +8,12 @@ struct ImageGenerationParameters {
     int noiseSeed { 0 };
     float noiseScale { 4.0f };
     int resolution { 256 };
+    float minHeightObject{ 0.25 };
+    float maxHeightObject{0.9};
+
+    //For Gaussian Mask
+    float esperance = 0.f;
+    float ecarttype = 0.3f;
 };
 
 struct PointsGenerationParameters {
