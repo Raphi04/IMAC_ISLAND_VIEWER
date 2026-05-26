@@ -73,6 +73,10 @@ void drawImGui(AppContext& context) {
         if (ImGui::Button("Random positions")) {
             generateObjectsPositions(context);
         }
+        if (ImGui::Button("Random map seed")) {
+            context.imageGenerationParameters.noiseSeed = p6::random::integer(0, 1000);
+            RegenerateMap(context);
+        }
 
         if (ImGui::Button("Random map layout")) {
             context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
@@ -158,6 +162,10 @@ void drawImGui(AppContext& context) {
             RegenerateMap(context);
         }
 
+        if (ImGui::SliderInt("Seed", &context.imageGenerationParameters.noiseSeed, 0, 1000)) {
+            RegenerateMap(context);
+        }
+
         if (ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f)) {
             RegenerateMap(context);
         }
@@ -175,7 +183,7 @@ void drawImGui(AppContext& context) {
         if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
             RegenerateMap(context);
         }
-        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.01f, 1.0f)) {
             RegenerateMap(context);
         }
         if (ImGui::SliderFloat("Hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.f, 0.5f)) {
@@ -185,6 +193,19 @@ void drawImGui(AppContext& context) {
             RegenerateMap(context);
         }
     }
+
+    if (ImGui::CollapsingHeader("noise", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderInt("Octave Number", &context.noiseGenerationParameters.nombreOctave, -10, 10);
+        ImGui::SliderFloat("Amplitude", &context.noiseGenerationParameters.gain, 0., 1.);
+        ImGui::SliderFloat("Lacuranite", &context.noiseGenerationParameters.lacuranite, -10., 10.);
+        ImGui::SliderFloat("Scale", &context.noiseGenerationParameters.scale, -10., 10.);
+        ImGui::SliderFloat("Seed", &context.noiseGenerationParameters.seed, -10., 10.);
+    }
+
+    if(ImGui::Button("Generate random seeds")) {
+        // generateRandomNoise(context);
+    }
+
 }
 
 

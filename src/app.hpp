@@ -12,7 +12,7 @@ struct ImageGenerationParameters {
     float maxHeightObject{0.9};
 
     //For Gaussian Mask
-    float esperance = 0.f;
+    float esperance = 0.1f;
     float ecarttype = 0.3f;
 };
 
@@ -22,6 +22,19 @@ struct PointsGenerationParameters {
     int nbEssaie { 4 };
     float rayonMinimal { 0.04 }; 
     int nbPointMax { 500 }; 
+};
+
+struct NoiseGenerationParameters {
+    // nombre de couches de bruits
+    int nombreOctave{};
+    // multiplicateur de fréquence à chaque octave
+    float lacuranite{};
+    // Le multiplicateur d'amplitude à chaque octave. Si le gain vaut 0.5, chaque octave successive aura deux fois moins d'impact visuel que la précédente. Les détails fins ne viennent pas gâcher la forme globale.
+    float gain{};
+    // zoom initial sur le bruit
+    float scale{};
+    // valeur de départ de ton générateur pseudo-aléatoire. Une même seed donnera toujours exactement le même terrain
+    float seed{};
 };
 
 struct AppContext {
@@ -56,8 +69,12 @@ struct AppContext {
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;
 
+    // Parameters for noise generation
+    NoiseGenerationParameters noiseGenerationParameters;
+
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
+
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);
