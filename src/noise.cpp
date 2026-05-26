@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
-
+#include <app.hpp>
 #include <cstdint>
 #include <functional>
 
@@ -55,11 +55,11 @@ float perlinNoiseSeeded(glm::vec2 const& position, int seed) {
     return glm::perlin(position + cachedOffset);
 }
 
-float octaveNoise(glm::vec2 const& position, std::function<float(glm::vec2 const&)> noiseFunction,int nombreOctave,float lacuranite,float gain, float scale,float seed) {
+float octaveNoise(glm::vec2 const& position, std::function<float(glm::vec2 const&)> noiseFunction, NoiseGenerationParameters& noiseGenerationParameters) {
     // TODO(student): Implement octave/fractal noise accumulation.
     // variable intégré dans app.hpp
-    for(int i=0;i<nombreOctave;i++){
-
+    for(int i=0;i<noiseGenerationParameters.nombreOctave;i++){
+        // noiseFunction noiseGenerationParameters.;
     }
     // Temporary fallback return directly from the provided noise function for testing.
     return noiseFunction(position);

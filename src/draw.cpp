@@ -52,6 +52,19 @@ void drawImGui(AppContext& context) {
     if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
     }
+
+    if (ImGui::CollapsingHeader("noise", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::SliderInt("Octave Number", &context.noiseGenerationParameters.nombreOctave, -10, 10);
+        ImGui::SliderFloat("Amplitude", &context.noiseGenerationParameters.gain, 0., 1.);
+        ImGui::SliderFloat("Lacuranite", &context.noiseGenerationParameters.lacuranite, -10., 10.);
+        ImGui::SliderFloat("Scale", &context.noiseGenerationParameters.scale, -10., 10.);
+        ImGui::SliderFloat("Seed", &context.noiseGenerationParameters.seed, -10., 10.);
+    }
+
+    if(ImGui::Button("Generate random seeds")) {
+        // generateRandomNoise(context);
+    }
+
 }
 
 void drawRaylibUI(AppContext& context) {

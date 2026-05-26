@@ -12,6 +12,20 @@ struct ImageGenerationParameters {
 
 struct PointsGenerationParameters {
     // TODO(student): add parameters for points generation (ex: poisson disk radius, etc).
+
+};
+
+struct NoiseGenerationParameters {
+    // nombre de couches de bruits
+    int nombreOctave{};
+    // multiplicateur de fréquence à chaque octave
+    float lacuranite{};
+    // Le multiplicateur d'amplitude à chaque octave. Si le gain vaut 0.5, chaque octave successive aura deux fois moins d'impact visuel que la précédente. Les détails fins ne viennent pas gâcher la forme globale.
+    float gain{};
+    // zoom initial sur le bruit
+    float scale{};
+    // valeur de départ de ton générateur pseudo-aléatoire. Une même seed donnera toujours exactement le même terrain
+    float seed{};
 };
 
 struct AppContext {
@@ -41,6 +55,9 @@ struct AppContext {
 
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;
+
+    // Parameters for noise generation
+    NoiseGenerationParameters noiseGenerationParameters;
 
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
