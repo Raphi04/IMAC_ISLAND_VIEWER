@@ -12,7 +12,7 @@ struct ImageGenerationParameters {
     float maxHeightObject{0.9};
 
     //For Gaussian Mask
-    float esperance = 0.f;
+    float esperance = 0.1f;
     float ecarttype = 0.3f;
 };
 
