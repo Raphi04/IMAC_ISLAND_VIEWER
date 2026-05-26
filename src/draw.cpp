@@ -19,10 +19,24 @@ void draw3DScene(AppContext& context) {
     Vector3 const terrainCenterOffset { terrainCentering.m12, terrainCentering.m13, terrainCentering.m14 };
 
     DrawModel(context.model, terrainCenterOffset, 1.0f, WHITE);
-    drawCubes(context, terrainCentering);
+    //drawCubes(context, terrainCentering);
+    drawSelectedModel(context, terrainCenterOffset);
     DrawGrid(20, 1.0f);
 
     EndMode3D();
+}
+
+void drawSelectedModel(AppContext const& context,  Vector3 const& terrainCenterOffset) {
+    for (glm::vec3 const& pos : context.objectPositions) {
+        
+        Vector3 position { 
+            pos.x * context.terrainSize.x + terrainCenterOffset.x,
+            pos.z * context.terrainSize.y + 0.5f * context.cubeScale + terrainCenterOffset.y,
+            pos.y * context.terrainSize.z + terrainCenterOffset.z
+        };
+        
+        DrawModel(context.selectedModel, position, context.cubeScale, WHITE);
+    }
 }
 
 void drawCubes(AppContext const& context, Matrix const& terrainCentering)
@@ -108,6 +122,33 @@ void drawImGui(AppContext& context) {
         if (ImGui::Button("Mesa")) 
         {
             selectBiome = 5;
+            RegenerateMap(context);
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Selection Modele 3D", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::SliderInt("Modele 3D", &context.selectedModelIndex, 1, 4)) {
+            switch (context.selectedModelIndex) {
+                case 1:
+                    context.selectedModel = LoadModel("../../resources/ado.glb");
+                    break;
+                
+                case 2 :
+                    context.selectedModel = LoadModel("../../resources/teto.glb");
+                    break;
+
+                case 3 :
+                    context.selectedModel = LoadModel("../../resources/capy.glb");
+                    break;
+
+                case 4 :
+                    context.selectedModel = LoadModel("../../resources/enderman.glb");
+                    break;
+
+                default:
+                    context.selectedModel = LoadModel("../../resources/ado.glb");
+                    break;
+            }
             RegenerateMap(context);
         }
     }

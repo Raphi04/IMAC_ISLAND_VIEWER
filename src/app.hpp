@@ -24,13 +24,6 @@ struct PointsGenerationParameters {
     int nbPointMax { 500 }; 
 };
 
-enum Seasons {
-    Spring,
-    Summer,
-    Fall,
-    Winter
-};
-
 struct AppContext {
     Camera camera {};
 
@@ -56,14 +49,15 @@ struct AppContext {
     Material cubeMaterial {};
     float cubeScale { 0.1f };
 
+    // 3D Model selection
+    int selectedModelIndex { 1 };
+    Model selectedModel {};
+
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;
 
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
-
-    // Seasons selector
-    Seasons season { Seasons::Spring };
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);
