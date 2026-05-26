@@ -8,11 +8,20 @@ struct ImageGenerationParameters {
     int noiseSeed { 0 };
     float noiseScale { 4.0f };
     int resolution { 256 };
+    float minHeightObject{ 0.25 };
+    float maxHeightObject{0.9};
+
+    //For Gaussian Mask
+    float esperance = 0.1f;
+    float ecarttype = 0.3f;
 };
 
 struct PointsGenerationParameters {
     // TODO(student): add parameters for points generation (ex: poisson disk radius, etc).
-
+    // Poisson Disk Sampling
+    int nbEssaie { 4 };
+    float rayonMinimal { 0.04 }; 
+    int nbPointMax { 500 }; 
 };
 
 struct NoiseGenerationParameters {
@@ -61,6 +70,9 @@ struct AppContext {
 
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
+
+    // Seasons selector
+    Seasons season { Seasons::Spring };
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);

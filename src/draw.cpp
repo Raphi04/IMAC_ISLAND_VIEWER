@@ -3,10 +3,12 @@
 #include "app.hpp"
 
 #include "generation.hpp"
-
+#include "third_party/random.hpp"
 #include "imgui.h"
 #include "raylib.h"
 #include "raymath.h"
+
+#include "biome.hpp"
 
 void draw3DScene(AppContext& context) {
     ClearBackground(RAYWHITE);
@@ -44,13 +46,111 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
     }
 }
 
-void drawImGui(AppContext& context) {
-    if(ImGui::Button("Generate random positions")) {
+void RegenerateMap(AppContext& context)
+{
+        generateHeightmap(context);
+        regenerateMeshFromImage(context);
         generateObjectsPositions(context);
+}
+
+void drawImGui(AppContext& context) {
+    if (ImGui::CollapsingHeader("Randomizer", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+        if (ImGui::Button("Random positions")) {
+            generateObjectsPositions(context);
+        }
+        if (ImGui::Button("Random map seed")) {
+            context.imageGenerationParameters.noiseSeed = p6::random::integer(0, 1000);
+            RegenerateMap(context);
+        }
+
+        if (ImGui::Button("Random map layout")) {
+            context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
+            context.imageGenerationParameters.ecarttype = p6::random::number(0.01f, 1.0f);
+            RegenerateMap(context);
+        }
+
+        if (ImGui::Button("Random biome")) {
+            selectBiome = p6::random::integer(0, biomes.size());
+            RegenerateMap(context);
+        }
+
+        if (ImGui::Button("Random height object")) {
+            context.imageGenerationParameters.minHeightObject = p6::random::number(0.f, 0.5f);
+            context.imageGenerationParameters.maxHeightObject = p6::random::number(0.5f, 1.f);
+            RegenerateMap(context);
+        }
     }
 
-    if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
+    
+    if (ImGui::CollapsingHeader("Biomes", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::Button("Plaine")) {
+            selectBiome = 0;
+            RegenerateMap(context);
+        }
+
+        if (ImGui::Button("Arctique")) 
+        {
+            selectBiome = 1;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Desert")) 
+        {
+            selectBiome = 2;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Magma")) 
+        {
+            selectBiome = 3;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("The End")) 
+        {
+            selectBiome = 4;
+            RegenerateMap(context);
+        }
+        if (ImGui::Button("Mesa")) 
+        {
+            selectBiome = 5;
+            RegenerateMap(context);
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderInt("Seed", &context.imageGenerationParameters.noiseSeed, 0, 1000)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f)) {
+            RegenerateMap(context);
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+
+        if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.01f, 1.0f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.f, 0.5f)) {
+            RegenerateMap(context);
+        }
+        if (ImGui::SliderFloat("Hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.5f, 1.f)) {
+            RegenerateMap(context);
+        }
     }
 
     if (ImGui::CollapsingHeader("noise", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -66,6 +166,7 @@ void drawImGui(AppContext& context) {
     }
 
 }
+
 
 void drawRaylibUI(AppContext& context) {
     int screenWidth { GetScreenWidth() };
