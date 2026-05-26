@@ -71,8 +71,6 @@ struct AppContext {
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
 
-    // Seasons selector
-    Seasons season { Seasons::Spring };
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);
