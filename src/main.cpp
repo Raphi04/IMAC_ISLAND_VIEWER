@@ -5,6 +5,7 @@
 #include "app.hpp"
 #include "draw.hpp"
 #include "generation.hpp"
+#include "sound.hpp"
 
 #include <filesystem>
 
@@ -24,6 +25,10 @@ int main() {
         SetWindowPosition(monitor_width/4, monitor_height/4);
     }
     SetTargetFPS(60);
+
+    // Audio
+    InitAudioDevice();  
+    loadSounds();
 
     rlImGuiSetup(true);
 

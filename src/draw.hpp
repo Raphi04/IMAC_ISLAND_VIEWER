@@ -3,6 +3,8 @@
 #include "app.hpp"
 #include "raylib.h"
 
+#include "sound.hpp"
+
 void draw3DScene(AppContext& context);
 void drawRaylibUI(AppContext& context);
 void drawCubes(AppContext const& context, Matrix const& terrainCentering);

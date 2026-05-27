@@ -134,18 +134,26 @@ void drawImGui(AppContext& context) {
         if (ImGui::SliderInt("Modele 3D", &context.selectedModelIndex, 1, 4)) {
             switch (context.selectedModelIndex) {
                 case 1:
+                    SetSoundVolume(ado, 0.5f);
+                    PlaySound(ado);
                     context.selectedModel = LoadModel("../../resources/ado.glb");
                     break;
                 
                 case 2 :
+                    SetSoundVolume(teto, 0.1f);
+                    PlaySound(teto);
                     context.selectedModel = LoadModel("../../resources/teto.glb");
                     break;
 
                 case 3 :
+                    SetSoundVolume(capy, 0.05f);
+                    PlaySound(capy);
                     context.selectedModel = LoadModel("../../resources/capy.glb");
                     break;
 
                 case 4 :
+                    SetSoundVolume(enderman, 0.2f);
+                    PlaySound(enderman);
                     context.selectedModel = LoadModel("../../resources/enderman.glb");
                     break;
 
