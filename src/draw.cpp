@@ -203,17 +203,19 @@ void drawImGui(AppContext& context) {
     }
 
     if (ImGui::CollapsingHeader("noise", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SliderInt("Octave Number", &context.noiseGenerationParameters.nombreOctave, -10, 10);
-        ImGui::SliderFloat("Amplitude", &context.noiseGenerationParameters.gain, 0., 1.);
-        ImGui::SliderFloat("Lacuranite", &context.noiseGenerationParameters.lacuranite, -10., 10.);
-        ImGui::SliderFloat("Scale", &context.noiseGenerationParameters.scale, -10., 10.);
-        ImGui::SliderFloat("Seed", &context.noiseGenerationParameters.seed, -10., 10.);
+        if(ImGui::SliderInt("Octave Number", &context.noiseGenerationParameters.nombreOctave, -10, 10)){
+            RegenerateMap(context);
+        };
+        if(ImGui::SliderFloat("Amplitude", &context.noiseGenerationParameters.gain, 0., 1.)){
+            RegenerateMap(context);
+        };
+        if(ImGui::SliderFloat("Lacuranite", &context.noiseGenerationParameters.lacuranite, -10., 10.)){
+            RegenerateMap(context);
+        };
+        if(ImGui::SliderFloat("Scale", &context.noiseGenerationParameters.scale, -10., 10.)){
+            RegenerateMap(context);
+        };
     }
-
-    if(ImGui::Button("Generate random seeds")) {
-        // generateRandomNoise(context);
-    }
-
 }
 
 
