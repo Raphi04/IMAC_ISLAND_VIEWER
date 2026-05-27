@@ -167,11 +167,6 @@ void drawImGui(AppContext& context) {
             RegenerateMap(context);
         };
     }
-
-    if(ImGui::Button("Generate random seeds")) {
-        // generateRandomNoise(context);
-    }
-
 }
 
 
