@@ -33,8 +33,6 @@ struct NoiseGenerationParameters {
     float gain{};
     // zoom initial sur le bruit
     float scale{};
-    // valeur de départ de ton générateur pseudo-aléatoire. Une même seed donnera toujours exactement le même terrain
-    float seed{};
 };
 
 struct AppContext {

@@ -188,7 +188,7 @@ void generateHeightmap(AppContext& context) {
         UnloadImage(context.heightmapImage);
         context.heightmapImage = {};
     }
-
+    
     int const resolution = std::max(1, context.imageGenerationParameters.resolution);
 
     context.heightmapImage = GenImageFromNoiseFunction<float>(resolution, resolution, PIXELFORMAT_UNCOMPRESSED_R32,
@@ -198,7 +198,18 @@ void generateHeightmap(AppContext& context) {
             glm::vec2 const center {0.5f,0.5f};
             float distance = glm::distance(p,center);
             float mask = gaussian(distance, context.imageGenerationParameters.ecarttype, context.imageGenerationParameters.esperance);
-            float basenoise = perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f;
+
+            float basenoise = octaveNoise(
+                p * context.imageGenerationParameters.noiseScale,
+                context.imageGenerationParameters.noiseSeed,
+                [](glm::vec2 const& position, int const& seed){
+                    return perlinNoiseSeeded(position, seed);
+                },
+                context.noiseGenerationParameters) * 0.5f + 0.5f;
+
+
+
+
             return (basenoise * mask);
         });
 
