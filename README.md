@@ -37,7 +37,7 @@ Vous pouvez modifier les paramètres suivants de manière aléatoire :
 
 - **Position aléatoire** : modifie le placement des objets sur l'île
 
-- **Seed de l'île** : modifie la seed qui permet de générer l'île
+- **Seed de l'île** : génère une seed aléatoire
  
 - **Génération aléatoire de l'île** : modifie les variables de génération de l'île (varie les valeurs du masque de gauss)
 
@@ -65,6 +65,8 @@ Vous pouvez modifier les paramètres suivants pour le masque :
 ### Bruit
 
 Vous pouvez modifier les paramètres suivants pour le bruit :
+
+- **Seed de l'île** : modifie la seed qui permet de générer l'île
 
 - **Nombre de couche** : modifie le nombre de couche de bruit
 

@@ -10,238 +10,271 @@
 
 #include "biome.hpp"
 
-void draw3DScene(AppContext& context) {
+void draw3DScene(AppContext &context)
+{
     ClearBackground(RAYWHITE);
-    
+
     BeginMode3D(context.camera);
 
-    Matrix const terrainCentering { getTerrainCenteringMatrix(context) };
-    Vector3 const terrainCenterOffset { terrainCentering.m12, terrainCentering.m13, terrainCentering.m14 };
+    Matrix const terrainCentering{getTerrainCenteringMatrix(context)};
+    Vector3 const terrainCenterOffset{terrainCentering.m12, terrainCentering.m13, terrainCentering.m14};
 
     DrawModel(context.model, terrainCenterOffset, 1.0f, WHITE);
-    //drawCubes(context, terrainCentering);
+    // drawCubes(context, terrainCentering);
     drawSelectedModel(context, terrainCenterOffset);
     DrawGrid(20, 1.0f);
 
     EndMode3D();
 }
 
-void drawSelectedModel(AppContext const& context,  Vector3 const& terrainCenterOffset) {
-    for (glm::vec3 const& pos : context.objectPositions) {
-        
-        Vector3 position { 
+void drawSelectedModel(AppContext const &context, Vector3 const &terrainCenterOffset)
+{
+    for (glm::vec3 const &pos : context.objectPositions)
+    {
+
+        Vector3 position{
             pos.x * context.terrainSize.x + terrainCenterOffset.x,
             pos.z * context.terrainSize.y + 0.5f * context.cubeScale + terrainCenterOffset.y,
-            pos.y * context.terrainSize.z + terrainCenterOffset.z
-        };
-        
+            pos.y * context.terrainSize.z + terrainCenterOffset.z};
+
         DrawModel(context.selectedModel, position, context.cubeScale, WHITE);
     }
 }
 
-void drawCubes(AppContext const& context, Matrix const& terrainCentering)
+void drawCubes(AppContext const &context, Matrix const &terrainCentering)
 {
-    if (context.objectPositions.empty()) {
+    if (context.objectPositions.empty())
+    {
         return;
     }
 
-    float const cubeHalfHeight { 0.5f * context.cubeScale };
+    float const cubeHalfHeight{0.5f * context.cubeScale};
 
-    for (glm::vec3 const& pos : context.objectPositions) {
-        Matrix const objectTranslation { MatrixTranslate(
+    for (glm::vec3 const &pos : context.objectPositions)
+    {
+        Matrix const objectTranslation{MatrixTranslate(
             pos.x * context.terrainSize.x,
             pos.z * context.terrainSize.y + cubeHalfHeight,
-            pos.y * context.terrainSize.z
-        )};
-        Matrix const centeredTranslation { MatrixMultiply(objectTranslation, terrainCentering) };
-        Matrix const scale { MatrixScale(context.cubeScale, context.cubeScale, context.cubeScale) };
-        Matrix const transform { MatrixMultiply(scale, centeredTranslation) };
+            pos.y * context.terrainSize.z)};
+        Matrix const centeredTranslation{MatrixMultiply(objectTranslation, terrainCentering)};
+        Matrix const scale{MatrixScale(context.cubeScale, context.cubeScale, context.cubeScale)};
+        Matrix const transform{MatrixMultiply(scale, centeredTranslation)};
         DrawMesh(context.cube, context.cubeMaterial, transform);
     }
 }
 
-void RegenerateMap(AppContext& context)
+void RegenerateMap(AppContext &context)
 {
-        generateHeightmap(context);
-        regenerateMeshFromImage(context);
-        generateObjectsPositions(context);
+    generateHeightmap(context);
+    regenerateMeshFromImage(context);
+    generateObjectsPositions(context);
 }
 
-void drawImGui(AppContext& context) {
-    if (ImGui::CollapsingHeader("Randomizer", ImGuiTreeNodeFlags_DefaultOpen)) {
+void drawImGui(AppContext &context)
+{
+    if (ImGui::CollapsingHeader("Génération aléatoire", ImGuiTreeNodeFlags_DefaultOpen))
+    {
 
-        if (ImGui::Button("Random positions")) {
+        if (ImGui::Button("Positions aléatoire des objets"))
+        {
             generateObjectsPositions(context);
         }
-        if (ImGui::Button("Random map seed")) {
+        if (ImGui::Button("Seed aléatoire"))
+        {
             context.imageGenerationParameters.noiseSeed = p6::random::integer(0, 1000);
             RegenerateMap(context);
         }
 
-        if (ImGui::Button("Random map layout")) {
+        if (ImGui::Button("Génération aléatoire de la carte"))
+        {
             context.imageGenerationParameters.esperance = p6::random::number(0.01f, 1.0f);
             context.imageGenerationParameters.ecarttype = p6::random::number(0.01f, 1.0f);
             RegenerateMap(context);
         }
 
-        if (ImGui::Button("Random biome")) {
+        if (ImGui::Button("Environnement aléatoire"))
+        {
             selectBiome = p6::random::integer(0, biomes.size());
             RegenerateMap(context);
         }
 
-        if (ImGui::Button("Random height object")) {
+        if (ImGui::Button("Limite de hauteur aléatoire"))
+        {
             context.imageGenerationParameters.minHeightObject = p6::random::number(0.f, 0.5f);
             context.imageGenerationParameters.maxHeightObject = p6::random::number(0.5f, 1.f);
             RegenerateMap(context);
         }
     }
 
-    
-    if (ImGui::CollapsingHeader("Biomes", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if (ImGui::Button("Plaine")) {
+    if (ImGui::CollapsingHeader("Environnements", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::Button("Plaine"))
+        {
             selectBiome = 0;
             RegenerateMap(context);
         }
 
-        if (ImGui::Button("Arctique")) 
+        if (ImGui::Button("Arctique"))
         {
             selectBiome = 1;
             RegenerateMap(context);
         }
-        if (ImGui::Button("Desert")) 
+        if (ImGui::Button("Desert"))
         {
             selectBiome = 2;
             RegenerateMap(context);
         }
-        if (ImGui::Button("Magma")) 
+        if (ImGui::Button("Magma"))
         {
             selectBiome = 3;
             RegenerateMap(context);
         }
-        if (ImGui::Button("The End")) 
+        if (ImGui::Button("The End"))
         {
             selectBiome = 4;
             RegenerateMap(context);
         }
-        if (ImGui::Button("Mesa")) 
+        if (ImGui::Button("Mesa"))
         {
             selectBiome = 5;
             RegenerateMap(context);
         }
     }
 
-    if (ImGui::CollapsingHeader("Selection Modele 3D", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if (ImGui::SliderInt("Modele 3D", &context.selectedModelIndex, 1, 4)) {
-            switch (context.selectedModelIndex) {
-                case 1:
-                    SetSoundVolume(ado, 0.5f);
-                    PlaySound(ado);
-                    context.selectedModel = LoadModel("../../resources/ado.glb");
-                    break;
-                
-                case 2 :
-                    SetSoundVolume(teto, 0.1f);
-                    PlaySound(teto);
-                    context.selectedModel = LoadModel("../../resources/teto.glb");
-                    break;
+    if (ImGui::CollapsingHeader("Séléction modèle 3D", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::SliderInt("Modele 3D", &context.selectedModelIndex, 1, 4))
+        {
+            switch (context.selectedModelIndex)
+            {
+            case 1:
+                SetSoundVolume(ado, 0.5f);
+                PlaySound(ado);
+                context.selectedModel = LoadModel("../../resources/ado.glb");
+                break;
 
-                case 3 :
-                    SetSoundVolume(capy, 0.05f);
-                    PlaySound(capy);
-                    context.selectedModel = LoadModel("../../resources/capy.glb");
-                    break;
+            case 2:
+                SetSoundVolume(teto, 0.1f);
+                PlaySound(teto);
+                context.selectedModel = LoadModel("../../resources/teto.glb");
+                break;
 
-                case 4 :
-                    SetSoundVolume(enderman, 0.2f);
-                    PlaySound(enderman);
-                    context.selectedModel = LoadModel("../../resources/enderman.glb");
-                    break;
+            case 3:
+                SetSoundVolume(capy, 0.05f);
+                PlaySound(capy);
+                context.selectedModel = LoadModel("../../resources/capy.glb");
+                break;
 
-                default:
-                    context.selectedModel = LoadModel("../../resources/ado.glb");
-                    break;
+            case 4:
+                SetSoundVolume(enderman, 0.2f);
+                PlaySound(enderman);
+                context.selectedModel = LoadModel("../../resources/enderman.glb");
+                break;
+
+            default:
+                context.selectedModel = LoadModel("../../resources/ado.glb");
+                break;
             }
             RegenerateMap(context);
         }
     }
 
-    if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if (ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f)) {
+    if (ImGui::CollapsingHeader("Masque", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::SliderFloat("Espérance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f))
+        {
             RegenerateMap(context);
         }
-
-        if (ImGui::SliderInt("Seed", &context.imageGenerationParameters.noiseSeed, 0, 1000)) {
-            RegenerateMap(context);
-        }
-
-        if (ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f)) {
-            RegenerateMap(context);
-        }
-
-        if (ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f)) {
+        if (ImGui::SliderFloat("Écart-type", &context.imageGenerationParameters.ecarttype, 0.01f, 1.0f))
+        {
             RegenerateMap(context);
         }
     }
 
-    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if (ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f)) {
+    if (ImGui::CollapsingHeader("Bruit", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+
+        if (ImGui::SliderInt("Seed", &context.imageGenerationParameters.noiseSeed, 0, 1000))
+        {
             RegenerateMap(context);
         }
 
-        if (ImGui::SliderFloat("Esperance", &context.imageGenerationParameters.esperance, 0.01f, 1.0f)) {
+        if (ImGui::SliderInt("Nombre d'octaves", &context.noiseGenerationParameters.nombreOctave, -10, 10))
+        {
+            RegenerateMap(context);
+        };
+        if (ImGui::SliderFloat("Amplitude", &context.noiseGenerationParameters.gain, 0., 1.))
+        {
+            RegenerateMap(context);
+        };
+        if (ImGui::SliderFloat("Lacuranite", &context.noiseGenerationParameters.lacuranite, -10., 10.))
+        {
+            RegenerateMap(context);
+        };
+        if (ImGui::SliderFloat("Echelle", &context.noiseGenerationParameters.scale, -10., 10.))
+        {
+            RegenerateMap(context);
+        };
+    }
+
+    if (ImGui::CollapsingHeader("Poisson Disk Sampling", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::SliderInt("Nombre d'essaie avant rejet", &context.pointsGenerationParameters.nbEssaie, 1.f, 15.f))
+        {
             RegenerateMap(context);
         }
-        if (ImGui::SliderFloat("Ecart type", &context.imageGenerationParameters.ecarttype, 0.01f, 1.0f)) {
+
+        if (ImGui::SliderFloat("Rayon minimal", &context.pointsGenerationParameters.rayonMinimal, 0.01f, 0.05f))
+        {
             RegenerateMap(context);
         }
-        if (ImGui::SliderFloat("Hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.f, 0.5f)) {
-            RegenerateMap(context);
-        }
-        if (ImGui::SliderFloat("Hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.5f, 1.f)) {
+
+        if (ImGui::SliderInt("Nombre de point maximum", &context.pointsGenerationParameters.nbPointMax, 1.f, 1000.0f))
+        {
             RegenerateMap(context);
         }
     }
 
-    if (ImGui::CollapsingHeader("noise", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if(ImGui::SliderInt("Octave Number", &context.noiseGenerationParameters.nombreOctave, -10, 10)){
+    if (ImGui::CollapsingHeader("Objets", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::SliderFloat("Échelle de l'objet", &context.cubeScale, 0.01f, 1.0f))
+        {
             RegenerateMap(context);
-        };
-        if(ImGui::SliderFloat("Amplitude", &context.noiseGenerationParameters.gain, 0., 1.)){
+        }
+        if (ImGui::SliderFloat("Hauteur minimale", &context.imageGenerationParameters.minHeightObject, 0.f, 0.5f))
+        {
             RegenerateMap(context);
-        };
-        if(ImGui::SliderFloat("Lacuranite", &context.noiseGenerationParameters.lacuranite, -10., 10.)){
+        }
+        if (ImGui::SliderFloat("Hauteur maximale", &context.imageGenerationParameters.maxHeightObject, 0.5f, 1.f))
+        {
             RegenerateMap(context);
-        };
-        if(ImGui::SliderFloat("Scale", &context.noiseGenerationParameters.scale, -10., 10.)){
-            RegenerateMap(context);
-        };
+        }
     }
 }
 
+void drawRaylibUI(AppContext &context)
+{
+    int screenWidth{GetScreenWidth()};
 
-void drawRaylibUI(AppContext& context) {
-    int screenWidth { GetScreenWidth() };
-    
-    float wanted_size { 400.f };
-    float scale_factor { wanted_size / std::max(context.texture.width, context.texture.height) };
-    float const preview_x { screenWidth - wanted_size - 20.f };
-    float const preview_y { 20.f };
-    float const preview_w { context.texture.width * scale_factor };
-    float const preview_h { context.texture.height * scale_factor };
+    float wanted_size{400.f};
+    float scale_factor{wanted_size / std::max(context.texture.width, context.texture.height)};
+    float const preview_x{screenWidth - wanted_size - 20.f};
+    float const preview_y{20.f};
+    float const preview_w{context.texture.width * scale_factor};
+    float const preview_h{context.texture.height * scale_factor};
     // DrawTexture(context.texture, screenWidth - context.texture.width - 20, 20, WHITE);
-    DrawTextureEx(context.texture, { preview_x, preview_y }, 0.0f, scale_factor, WHITE);
+    DrawTextureEx(context.texture, {preview_x, preview_y}, 0.0f, scale_factor, WHITE);
     DrawRectangleLines(screenWidth - wanted_size - 20, 20, wanted_size, wanted_size, GREEN);
 
-    //draw positions on top of the heightmap
-    for (auto const& pos : context.objectPositions)
+    // draw positions on top of the heightmap
+    for (auto const &pos : context.objectPositions)
     {
         // Remap normalized coordinates [0..1] to the preview image in screen space.
-        float const px { preview_x + Clamp(pos.x, 0.0f, 1.0f) * preview_w };
-        float const py { preview_y + Clamp(pos.y, 0.0f, 1.0f) * preview_h };
+        float const px{preview_x + Clamp(pos.x, 0.0f, 1.0f) * preview_w};
+        float const py{preview_y + Clamp(pos.y, 0.0f, 1.0f) * preview_h};
 
-        DrawCircleV({ px, py }, 2.0f, RED);
+        DrawCircleV({px, py}, 2.0f, RED);
     }
 
     DrawFPS(10, 10);
 }
-
