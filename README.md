@@ -6,7 +6,8 @@ Raphael CADETE | Julien LEEDER | Yanis WONG
 
 ## Bruit fractal
 
-Utilisation des sites mis à disposition pour la compréhension du fonctionnement du bruit et de l'utilité de chaque variable.
+Utilisation des sites mis à disposition pour la compréhension du fonctionnement du bruit et de l'utilité de chaque variable et aide de Jules en TD
+
 https://thebookofshaders.com/13/?lan=fr
 https://iquilezles.org/articles/fbm/
 
@@ -72,13 +73,13 @@ Vous pouvez modifier les paramètres suivants pour le bruit :
 
 - **Seed de l'île** : modifie la seed qui permet de générer l'île
 
-- **Nombre de couche** : modifie le nombre de couche de bruit
+- **Nombre de couche** : modifie le nombre de couche de bruit accumulées
 
-- **Amplitude** : modifie l'amplitude du bruit
+- **Amplitude** : modifie l'amplitude du bruit (de chaque octave)
 
-- **Lacunarité** : modifie la lacunarité du bruit
+- **Lacunarité** : facteur mutliplicateur de la fréquence de chaque octave
 
-- **Echelle** : modifie l'échelle du bruit
+- **Echelle** : modifie l'échelle du bruit (sa "taille")
 
 ### Poisson disk sampling
 
