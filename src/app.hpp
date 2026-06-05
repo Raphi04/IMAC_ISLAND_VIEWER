@@ -12,8 +12,8 @@ struct ImageGenerationParameters {
     float maxHeightObject{0.9};
 
     //For Gaussian Mask
-    float esperance = 0.1f;
-    float ecarttype = 0.3f;
+    float esperance = 0.2f;
+    float ecarttype = 0.4f;
 };
 
 struct PointsGenerationParameters {
@@ -26,11 +26,11 @@ struct PointsGenerationParameters {
 
 struct NoiseGenerationParameters {
     // nombre de couches de bruits
-    int nombreOctave{};
+    int nombreOctave{4};
     // multiplicateur de fréquence à chaque octave
-    float lacuranite{};
+    float lacuranite{0.0f};
     // Le multiplicateur d'amplitude à chaque octave. Si le gain vaut 0.5, chaque octave successive aura deux fois moins d'impact visuel que la précédente. Les détails fins ne viennent pas gâcher la forme globale.
-    float gain{};
+    float gain{0.75f};
     // zoom initial sur le bruit
     float scale{};
 };
