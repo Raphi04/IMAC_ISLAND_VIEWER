@@ -150,3 +150,14 @@ Voici la répartition du travail dans notre groupe :
 - **Raphael CADETE** : Poisson disk sampling, relecture et corrections, import des modèles 3D et du son
 
 - **Julien LEEDER** : Heightmap et couleurs, limite de hauteur, aléatoire et interface utilisateur
+
+## Références
+
+- [Modèle de Teto](https://sketchfab.com/3d-models/kasane-teto-plush-736f0bddd7b349c3a471e85ef7a6771f)
+
+- [Modèle d'Ado](https://sketchfab.com/3d-models/ado-d-f644eeb1d8ef4d90b101373a0348858e)
+
+- [Modèle de Capybara](https://sketchfab.com/3d-models/capybara-low-poly-2b9e0100da7245079fa3d54eedd81030)
+
+- [Modèle d'enderman](https://sketchfab.com/3d-models/minecraft-enderman-216552744553461d960dd0cdf3a0592a)
+ 
