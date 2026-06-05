@@ -6,6 +6,10 @@ Raphael CADETE | Julien LEEDER | Yanis WONG
 
 ## Bruit fractal
 
+Utilisation des sites mis à disposition pour la compréhension du fonctionnement du bruit et de l'utilité de chaque variable.
+https://thebookofshaders.com/13/?lan=fr
+https://iquilezles.org/articles/fbm/
+
 ## Génération de heightmap et couleurs
 
 Random de Jules
@@ -68,6 +72,8 @@ Vous pouvez modifier les paramètres suivants pour le masque :
 
 ### Bruit fractal
 
+La difficulté principale que j'ai rencontré, c'est la compréhension de comment utiliser chaque variable pour faire le bruit, car même si je comprenais ce qu'elle devait faire, je n'arriver pas à comprendre comment le retranscrire en code.
+
 ### Heightmap et couleurs
 
 ### Poisson disk sampling
@@ -104,7 +110,7 @@ On pourrait optimiser les performances du programme en faisant en sorte que quan
 
 Voici la répartition du travail dans notre groupe :
 
-- **Yanis WONG** : Bruit fractal
+- **Yanis WONG** : Bruit fractal et interface utilisateur
 
 - **Raphael CADETE** : Poisson disk sampling, README.md, relecture, corrections et interface utilisateur
 
