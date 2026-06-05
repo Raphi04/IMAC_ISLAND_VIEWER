@@ -105,7 +105,7 @@ Vous pouvez modifier les paramètres suivants pour les objets :
 
 ### Bruit fractal
 
-La difficulté principale que j'ai rencontré, c'est la compréhension de comment utiliser chaque variable pour faire le bruit, car même si je comprenais ce qu'elle devait faire, je n'arriver pas à comprendre comment le retranscrire en code.
+La difficulté principale que j'ai rencontré, c'est la compréhension de comment utiliser chaque variable pour faire le bruit, car même si je comprenais ce qu'elle devait faire, je n'arrivais pas à comprendre comment le retranscrire en code.
 
 ### Heightmap et couleurs
 
