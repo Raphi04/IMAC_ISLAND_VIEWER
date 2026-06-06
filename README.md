@@ -13,7 +13,7 @@ https://iquilezles.org/articles/fbm/
 
 ## Génération de heightmap et couleurs
 
-Pour ce qui est de la heightmap, elle est générée à partir d'un mélange de bruits (octave noise, bruit gaussien et perlin noise) via un produit des deux masques. Après avoir généré le bruit, nous avons créée une fonction permettant de faire un color lerp (dégradé de couleurs) basé sur la hauteur du pixel et la palette de couleur affiliée. Une struct *color height*, contenant  la couleur et la hauteur du pixel, a été mis en place.
+Pour ce qui est de la heightmap, elle est générée à partir d'un mélange de bruits (octave noise, bruit gaussien et perlin noise) via un produit des deux masques. Après avoir généré le bruit, nous avons créée une fonction permettant de faire un color lerp (dégradé de couleurs) basé sur la hauteur du pixel et la palette de couleur affiliée. Une struct _color height_, contenant la couleur et la hauteur du pixel, a été mis en place.
 
 Elle nous a notamment permis de réaliser des tableaux de couleurs (hauteur et couleur en RGBA) pour créer différents biomes :
 
@@ -43,7 +43,7 @@ Vous pouvez modifier les paramètres suivants de manière aléatoire :
 - **Position aléatoire** : modifie le placement des objets sur l'île
 
 - **Seed de l'île** : génère une seed aléatoire
- 
+
 - **Génération aléatoire de l'île** : modifie les variables de génération de l'île (varie les valeurs du masque de gauss)
 
 - **Environnement aléatoire** : selectionne une couleur d'environnement
@@ -109,7 +109,7 @@ La difficulté principale que j'ai rencontré, c'est la compréhension de commen
 
 ### Heightmap et couleurs
 
-Trouver comment faire le dégradé a été assez difficile, mais après avoir cherché dans la doc de Raylib, nous nous sommes rendu compte qu'il existait une fonction pour faire un *lerp* qui était en adéquation avec ce qu'on voulait faire.
+Trouver comment faire le dégradé a été assez difficile, mais après avoir cherché dans la doc de Raylib, nous nous sommes rendu compte qu'il existait une fonction pour faire un _lerp_ qui était en adéquation avec ce qu'on voulait faire.
 
 ### Poisson disk sampling
 
@@ -119,11 +119,11 @@ Le plus dure dans le Poisson disk sampling etait de réussir à traduire le code
 
 Voici des images comparatives de nos changements.
 
-### Bruit fractal
+Avant les modifications :
+![Image avant modifications](./images/avant.png)
 
-### Heightmap et couleurs
-
-### Poisson disk sampling
+Après les modifications :
+![Image après modifications](./images/apres.png)
 
 ## Retrospection
 
@@ -160,4 +160,3 @@ Voici la répartition du travail dans notre groupe :
 - [Modèle de Capybara](https://sketchfab.com/3d-models/capybara-low-poly-2b9e0100da7245079fa3d54eedd81030)
 
 - [Modèle d'enderman](https://sketchfab.com/3d-models/minecraft-enderman-216552744553461d960dd0cdf3a0592a)
- 
