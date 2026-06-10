@@ -60,10 +60,11 @@ float octaveNoise(glm::vec2 const& position, int const& seed, std::function<floa
     float total = 0;
     float amplitude =  noiseGenerationParameters.gain;
     float frequency = 1;
+    glm::vec2 pScale = position * noiseGenerationParameters.scale;
     for(int i=0;i<noiseGenerationParameters.nombreOctave;i++){
-        total +=amplitude*noiseFunction(position * frequency, seed);
+        total +=amplitude*noiseFunction(pScale * frequency, seed);
         amplitude/=2;
-        frequency*=2;
+        frequency*=noiseGenerationParameters.lacuranite;
     }
     // Temporary fallback return directly from the provided noise function for testing.
     return total;
